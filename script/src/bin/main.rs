@@ -15,8 +15,11 @@ use clap::Parser;
 use fibonacci_lib::PublicValuesStruct;
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
 
+mod cli;
+use cli::ProviderArgs;
+
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
-pub const FIBONACCI_ELF: &[u8] = include_elf!("fibonacci-program");
+pub const FIBONACCI_ELF: &[u8] = include_elf!("eth-consensus");
 
 /// The arguments for the command.
 #[derive(Parser, Debug)]
@@ -30,6 +33,12 @@ struct Args {
 
     #[clap(long, default_value = "20")]
     n: u32,
+
+    #[clap(long)]
+    slot_number: u32,
+
+    #[clap(flatten)]
+    provider: ProviderArgs,
 }
 
 fn main() {
