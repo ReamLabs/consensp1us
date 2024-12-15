@@ -4,7 +4,7 @@ use lighthouse_eth2::{
     types::{BlockId, StateId},
     BeaconNodeHttpClient, SensitiveUrl, Timeouts,
 };
-use lighthouse_types::{MainnetEthSpec, SignedBeaconBlock, Slot};
+use lighthouse_types::{BlindedPayload, MainnetEthSpec, SignedBeaconBlock, Slot};
 
 pub struct BeaconClient {
     client: BeaconNodeHttpClient,
@@ -36,10 +36,11 @@ impl BeaconClient {
     pub async fn get_beacon_block(
         &self,
         slot: u64,
-    ) -> Result<Option<SignedBeaconBlock<MainnetEthSpec>>, String> {
+    ) -> Result<Option<SignedBeaconBlock<MainnetEthSpec, BlindedPayload<MainnetEthSpec>>>, String>
+    {
         let block = self
             .client
-            .get_beacon_blocks::<MainnetEthSpec>(BlockId::Slot(slot.into()))
+            .get_beacon_blinded_blocks::<MainnetEthSpec>(BlockId::Slot(slot.into()))
             .await
             .map_err(|e| format!("Failed to get beacon block: {:?}", e))?;
 
@@ -57,7 +58,8 @@ impl BeaconClient {
         &self,
         start: u64,
         end: u64,
-    ) -> Result<Vec<SignedBeaconBlock<MainnetEthSpec>>, String> {
+    ) -> Result<Vec<SignedBeaconBlock<MainnetEthSpec, BlindedPayload<MainnetEthSpec>>>, String>
+    {
         let mut blocks = Vec::new();
 
         for slot in start..=end {
