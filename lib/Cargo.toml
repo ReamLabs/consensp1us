@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 tracing = { version = "0.1" }
+lighthouse-state-processing = { git = "https://github.com/pawanjay176/lighthouse", package = "state_processing", rev = "def2498bc4114b4bd7933cf3bb9a45a555d24ede" } # Lighthouse for Mekong 
+lighthouse-types.workspace = true
