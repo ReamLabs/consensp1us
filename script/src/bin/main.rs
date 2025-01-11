@@ -63,7 +63,9 @@ async fn main() {
 
     // temporarily code for testing
     let _ = beacon_client.get_beacon_state(args.slot_number).await;
-    let _ = beacon_client.get_beacon_blocks(285500, 285510).await;
+    let _ = beacon_client
+        .get_beacon_blocks(args.slot_number, args.slot_number + 10)
+        .await;
 
     // Setup the prover client.
     let client = ProverClient::new();
