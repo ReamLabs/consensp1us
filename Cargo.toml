@@ -7,6 +7,8 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-lighthouse-beacon-node = { git = "https://github.com/pawanjay176/lighthouse", package = "beacon_node", rev = "def2498bc4114b4bd7933cf3bb9a45a555d24ede" } # Lighthouse for Mekong 
-lighthouse-eth2 = { git = "https://github.com/pawanjay176/lighthouse", package = "eth2", rev = "def2498bc4114b4bd7933cf3bb9a45a555d24ede" } # Lighthouse for Mekong
-lighthouse-types = { git = "https://github.com/pawanjay176/lighthouse", package = "types", rev = "def2498bc4114b4bd7933cf3bb9a45a555d24ede" } # Lighthouse for Mekong
+# Selected version for Mekong Testnet
+# https://github.com/sigp/lighthouse/tree/87b72dec21759acfbc749220be3aee11ac91cdf3
+lighthouse-beacon-node = { git = "https://github.com/sigp/lighthouse", package = "beacon_node", rev = "87b72dec21759acfbc749220be3aee11ac91cdf3" } 
+lighthouse-eth2 = { git = "https://github.com/sigp/lighthouse", package = "eth2", rev = "87b72dec21759acfbc749220be3aee11ac91cdf3" }
+lighthouse-types = { git = "https://github.com/sigp/lighthouse", package = "types", rev = "87b72dec21759acfbc749220be3aee11ac91cdf3" }
