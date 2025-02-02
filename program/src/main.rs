@@ -1,6 +1,3 @@
-//! A simple program that takes a number `n` as input, and writes the `n-1`th and `n`th fibonacci
-//! number as an output.
-
 // These two lines are necessary for the program to properly compile.
 //
 // Under the hood, we wrap your main function with some extra code so that it behaves properly
@@ -8,8 +5,7 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
-use alloy_sol_types::SolType;
-use fibonacci_lib::{fibonacci, PublicValuesStruct};
+use ream_lib::isomorphic_function;
 
 pub fn main() {
     // Read an input to the program.
@@ -18,11 +14,10 @@ pub fn main() {
     // from the prover.
     let n = sp1_zkvm::io::read::<u32>();
 
-    // Compute the n'th fibonacci number using a function from the workspace lib crate.
-    let (a, b) = fibonacci(n);
+    let a = isomorphic_function(n);
 
     // Encode the public values of the program.
-    let bytes = PublicValuesStruct::abi_encode(&PublicValuesStruct { n, a, b });
+    let bytes = a.to_le_bytes();
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.

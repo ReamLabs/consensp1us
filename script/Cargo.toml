@@ -1,11 +1,11 @@
 [package]
 version = "0.1.0"
-name = "fibonacci-script"
+name = "ream-script"
 edition = "2021"
-default-run = "fibonacci"
+default-run = "ream"
 
 [[bin]]
-name = "fibonacci"
+name = "ream"
 path = "src/bin/main.rs"
 
 [[bin]]
@@ -17,10 +17,9 @@ sp1-sdk = "4.0.0"
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0.200", default-features = false, features = ["derive"] }
 clap = { version = "4.0", features = ["derive", "env"] }
-tracing = "0.1.40"
+tracing = { workspace = true }
 hex = "0.4.3"
-alloy-sol-types = { workspace = true }
-fibonacci-lib = { path = "../lib" }
+ream-lib = { path = "../lib" }
 dotenv = "0.15.0"
 
 [build-dependencies]
