@@ -8,10 +8,6 @@ default-run = "ream"
 name = "ream"
 path = "src/bin/main.rs"
 
-[[bin]]
-name = "vkey"
-path = "src/bin/vkey.rs"
-
 [dependencies]
 sp1-sdk = "4.0.0"
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }

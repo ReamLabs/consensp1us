@@ -40,11 +40,3 @@ To generate a core proof for your program:
 cd script
 cargo run --release -- --prove
 ```
-
-### Retrieve the Verification Key
-
-To retrieve your `programVKey` for your on-chain contract, run the following command in `script`:
-
-```sh
-cargo run --release --bin vkey
-```
