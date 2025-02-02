@@ -5,21 +5,23 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
-use ream_lib::isomorphic_function;
+use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState};
 
 pub fn main() {
     // Read an input to the program.
     //
     // Behind the scenes, this compiles down to a custom system call which handles reading inputs
     // from the prover.
-    let n = sp1_zkvm::io::read::<u32>();
+    // NOTE: BeaconState/BeaconBlock should implement Serialize & Deserialize trait.
+    let mut pre_state = sp1_zkvm::io::read::<BeaconState>();
+    let block = sp1_zkvm::io::read::<BeaconBlock>();
 
-    let a = isomorphic_function(n);
-
-    // Encode the public values of the program.
-    let bytes = a.to_le_bytes();
+    // Main logic of the program.
+    // State transition of the beacon state.
+    let _ = pre_state.process_block_header(block);
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.
-    sp1_zkvm::io::commit_slice(&bytes);
+    // NOTE: BeaconState should implement Serialize & Deserialize trait.
+    sp1_zkvm::io::commit::<BeaconState>(&pre_state);
 }

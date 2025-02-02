@@ -7,5 +7,9 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
+ethereum_ssz = "0.8.2"
 tracing = "0.1.40"
-ream-consensus = { git = "https://github.com/ReamLabs/ream", package = "ream-consensus" }
+ream-consensus = { git = "https://github.com/unnawut/ream", package = "ream-consensus", branch = "remove-deserialize" }
+
+[patch.crates-io]
+ethereum_hashing = { git = "https://github.com/unnawut/ethereum_hashing", branch = "sha256context" }

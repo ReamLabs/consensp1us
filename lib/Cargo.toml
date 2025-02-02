@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ethereum_ssz = "0.8.2"
+ethereum_ssz = { workspace = true }
 snap = "1.1.1"
 tracing = { workspace = true }

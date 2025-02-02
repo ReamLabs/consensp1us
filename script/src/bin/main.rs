@@ -26,9 +26,6 @@ struct Args {
 
     #[clap(long)]
     prove: bool,
-
-    #[clap(long, default_value = "20")]
-    n: u32,
 }
 
 fn main() {
@@ -48,6 +45,9 @@ fn main() {
         std::process::exit(1);
     }
 
+    // Load the test assets.
+    // This asset is from consensus-specs repo.
+    // Path: tests/mainnet/deneb/operations/block_header/pyspec_tests/basic_block_header
     let base_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("src")
         .join("data");
@@ -57,27 +57,29 @@ fn main() {
             .expect("cannot find test asset(pre.ssz_snappy) or decode it");
     let block: BeaconBlock = ream_lib::snappy::read_ssz_snappy(&base_dir.join("block.ssz_snappy"))
         .expect("cannot find test asset(block.ssz_snappy) or decode it");
+    let post_state: BeaconState =
+        ream_lib::snappy::read_ssz_snappy(&base_dir.join("post.ssz_snappy"))
+            .expect("cannot find test asset(post.ssz_snappy) or decode it");
 
     // Setup the prover client.
     let client = ProverClient::from_env();
 
     // Setup the inputs.
     let mut stdin = SP1Stdin::new();
-    stdin.write(&args.n);
-
-    println!("n: {}", args.n);
+    stdin.write(&pre_state);
+    stdin.write(&block);
 
     if args.execute {
         // Execute the program
         let (output, report) = client.execute(REAM_ELF, &stdin).run().unwrap();
         println!("Program executed successfully.");
-        // Read the output
-        let result: u32 = output.clone().read::<u32>();
-        println!("Result: {}", result);
 
-        let expected = ream_lib::isomorphic_function(args.n);
-        assert_eq!(result, expected);
-        println!("Values are correct!");
+        // Read the output
+        let result: BeaconState = output.clone().read();
+
+        // Compare the output with the expected post state.
+        assert_eq!(result, post_state);
+        println!("Execution is correct!");
 
         // Record the number of cycles executed.
         println!("Number of cycles: {}", report.total_instruction_count());

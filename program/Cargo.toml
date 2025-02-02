@@ -4,5 +4,12 @@ name = "ream-program"
 edition = "2021"
 
 [dependencies]
+# SP1 dependencies
 sp1-zkvm = "4.0.0"
+
+# Ethereum dependencies
+ethereum_ssz = { workspace = true }
+
+# Ream dependencies
+ream-consensus = { workspace = true }
 ream-lib = { path = "../lib" }

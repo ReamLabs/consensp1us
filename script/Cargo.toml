@@ -22,8 +22,8 @@ hex = "0.4.3"
 dotenv = "0.15.0"
 
 # Ream dependencies
-ream-lib = { path = "../lib" }
 ream-consensus = { workspace = true }
+ream-lib = { path = "../lib" }
 
 [build-dependencies]
 sp1-build = "4.0.0"
