@@ -19,8 +19,11 @@ serde = { version = "1.0.200", default-features = false, features = ["derive"] }
 clap = { version = "4.0", features = ["derive", "env"] }
 tracing = { workspace = true }
 hex = "0.4.3"
-ream-lib = { path = "../lib" }
 dotenv = "0.15.0"
+
+# Ream dependencies
+ream-lib = { path = "../lib" }
+ream-consensus = { workspace = true }
 
 [build-dependencies]
 sp1-build = "4.0.0"
