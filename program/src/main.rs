@@ -13,15 +13,27 @@ pub fn main() {
     // Behind the scenes, this compiles down to a custom system call which handles reading inputs
     // from the prover.
     // NOTE: BeaconState/BeaconBlock should implement Serialize & Deserialize trait.
+
+    println!("cycle-tracker-start: read-pre-state");
     let mut pre_state = sp1_zkvm::io::read::<BeaconState>();
+    println!("cycle-tracker-end: read-pre-state");
+
+    println!("cycle-tracker-start: read-block");
     let block = sp1_zkvm::io::read::<BeaconBlock>();
+    println!("cycle-tracker-end: read-block");
 
     // Main logic of the program.
     // State transition of the beacon state.
+
+    println!("cycle-tracker-start: process-block-header");
     let _ = pre_state.process_block_header(block);
+    println!("cycle-tracker-end: process-block-header");
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.
     // NOTE: BeaconState should implement Serialize & Deserialize trait.
+
+    println!("cycle-tracker-start: commit");
     sp1_zkvm::io::commit::<BeaconState>(&pre_state);
+    println!("cycle-tracker-end: commit");
 }
