@@ -11,6 +11,7 @@
 //! ```
 
 use clap::Parser;
+use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState};
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
@@ -46,6 +47,16 @@ fn main() {
         eprintln!("Error: You must specify either --execute or --prove");
         std::process::exit(1);
     }
+
+    let base_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("src")
+        .join("data");
+
+    let pre_state: BeaconState =
+        ream_lib::snappy::read_ssz_snappy(&base_dir.join("pre.ssz_snappy"))
+            .expect("cannot find test asset(pre.ssz_snappy) or decode it");
+    let block: BeaconBlock = ream_lib::snappy::read_ssz_snappy(&base_dir.join("block.ssz_snappy"))
+        .expect("cannot find test asset(block.ssz_snappy) or decode it");
 
     // Setup the prover client.
     let client = ProverClient::from_env();
