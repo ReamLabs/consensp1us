@@ -74,8 +74,8 @@ fn main() {
         let (output, report) = client.execute(REAM_ELF, &stdin).run().unwrap();
         println!("Program executed successfully.");
 
-        // Read the output
-        let result: BeaconState = output.clone().read();
+        // Decode the output
+        let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
 
         // Compare the output with the expected post state.
         assert_eq!(result, post_state);

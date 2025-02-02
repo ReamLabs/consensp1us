@@ -17,6 +17,9 @@ tracing = { workspace = true }
 hex = "0.4.3"
 dotenv = "0.15.0"
 
+# Ethereum dependencies
+ethereum_ssz = { workspace = true }
+
 # Ream dependencies
 ream-consensus = { workspace = true }
 ream-lib = { path = "../lib" }

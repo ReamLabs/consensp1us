@@ -3694,6 +3694,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "dotenv",
+ "ethereum_ssz",
  "hex",
  "ream-consensus",
  "ream-lib",

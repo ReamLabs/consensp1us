@@ -6,6 +6,7 @@
 sp1_zkvm::entrypoint!(main);
 
 use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState};
+use ssz::Encode;
 
 pub fn main() {
     // Read an input to the program.
@@ -33,7 +34,11 @@ pub fn main() {
     // bytes that were committed to.
     // NOTE: BeaconState should implement Serialize & Deserialize trait.
 
+    println!("cycle-tracker-start: convert-to-ssz-bytes");
+    let pre_state_bytes = pre_state.as_ssz_bytes();
+    println!("cycle-tracker-end: convert-to-ssz-bytes");
+
     println!("cycle-tracker-start: commit");
-    sp1_zkvm::io::commit::<BeaconState>(&pre_state);
+    sp1_zkvm::io::commit_slice(&pre_state_bytes);
     println!("cycle-tracker-end: commit");
 }
