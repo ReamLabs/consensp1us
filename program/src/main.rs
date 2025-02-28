@@ -27,7 +27,7 @@ pub fn main() {
     // State transition of the beacon state.
 
     println!("cycle-tracker-start: process-block-header");
-    let _ = pre_state.process_block_header(block);
+    let _ = pre_state.process_block_header(&block);
     println!("cycle-tracker-end: process-block-header");
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
