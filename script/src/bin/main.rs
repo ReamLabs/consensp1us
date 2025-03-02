@@ -11,8 +11,25 @@
 //! ```
 
 use clap::Parser;
-use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState};
+use cli::operation::OperationName;
+use ream_consensus::{
+    attestation::Attestation,
+    attester_slashing::AttesterSlashing,
+    bls_to_execution_change::SignedBLSToExecutionChange,
+    deneb::{
+        beacon_block::BeaconBlock, beacon_block_body::BeaconBlockBody, beacon_state::BeaconState,
+        execution_payload::ExecutionPayload,
+    },
+    deposit::Deposit,
+    proposer_slashing::ProposerSlashing,
+    sync_aggregate::SyncAggregate,
+    voluntary_exit::SignedVoluntaryExit,
+};
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
+
+mod cli;
+
+use ream_lib::input::OperationInput;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const REAM_ELF: &[u8] = include_elf!("ream-operations");
@@ -21,14 +38,33 @@ pub const REAM_ELF: &[u8] = include_elf!("ream-operations");
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
+    /// Argument for zkVMs
+
     #[clap(long)]
     execute: bool,
 
     #[clap(long)]
     prove: bool,
+
+    /// Argument for STFs
+
+    #[clap(flatten)]
+    fork: cli::fork::ForkArgs,
+
+    #[clap(flatten)]
+    operation: cli::operation::OperationArgs,
 }
 
 fn main() {
+    let test_case_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("mainnet")
+        .join("tests")
+        .join("mainnet");
+    if !std::path::Path::new(&test_case_dir).exists() {
+        eprintln!("Error: You must first download test data via `make download`");
+        std::process::exit(1);
+    }
+
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
@@ -45,58 +81,130 @@ fn main() {
         std::process::exit(1);
     }
 
+    let fork: cli::fork::Fork = args.fork.fork;
+    let operation_name: cli::operation::OperationName = args.operation.operation_name;
+
     // Load the test assets.
-    // This asset is from consensus-specs repo.
-    // Path: tests/mainnet/deneb/operations/block_header/pyspec_tests/basic_block_header
-    let base_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("src")
-        .join("data");
+    // These assets are from consensus-specs repo.
+    let base_dir = test_case_dir
+        .join(format!("{}", fork))
+        .join("operations")
+        .join(format!("{}", operation_name))
+        .join("pyspec_tests");
 
-    let pre_state: BeaconState =
-        ream_lib::snappy::read_ssz_snappy(&base_dir.join("pre.ssz_snappy"))
-            .expect("cannot find test asset(pre.ssz_snappy) or decode it");
-    let block: BeaconBlock = ream_lib::snappy::read_ssz_snappy(&base_dir.join("block.ssz_snappy"))
-        .expect("cannot find test asset(block.ssz_snappy) or decode it");
-    let post_state: BeaconState =
-        ream_lib::snappy::read_ssz_snappy(&base_dir.join("post.ssz_snappy"))
-            .expect("cannot find test asset(post.ssz_snappy) or decode it");
+    let test_cases = ream_lib::file::get_test_cases(&base_dir);
+    for test_case in test_cases {
+        println!("[{}] Test case: {}", operation_name, test_case);
 
-    // Setup the prover client.
-    let client = ProverClient::from_env();
+        let case_dir = &base_dir.join(test_case);
+        let input_path = &case_dir.join(format!("{}.ssz_snappy", operation_name.to_input_name()));
 
-    // Setup the inputs.
-    let mut stdin = SP1Stdin::new();
-    stdin.write(&pre_state);
-    stdin.write(&block);
+        let pre_state: BeaconState =
+            ream_lib::snappy::read_ssz_snappy(&case_dir.join("pre.ssz_snappy"))
+                .expect("cannot find test asset(pre.ssz_snappy) or decode it");
+        let input = match operation_name {
+            OperationName::Attestation => {
+                let input: Attestation = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::Attestation(input)
+            }
+            OperationName::AttesterSlashing => {
+                let input: AttesterSlashing = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::AttesterSlashing(input)
+            }
+            OperationName::BlockHeader => {
+                let input: BeaconBlock = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::BeaconBlock(input)
+            }
+            OperationName::BLSToExecutionChange => {
+                let input: SignedBLSToExecutionChange =
+                    ream_lib::snappy::read_ssz_snappy(input_path)
+                        .expect("cannot find input asset or decode it");
+                OperationInput::SignedBLSToExecutionChange(input)
+            }
+            OperationName::Deposit => {
+                let input: Deposit = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::Deposit(input)
+            }
+            OperationName::ExecutionPayload => {
+                let input: BeaconBlockBody = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::BeaconBlockBody(input)
+            }
+            OperationName::ProposerSlashing => {
+                let input: ProposerSlashing = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::ProposerSlashing(input)
+            }
+            OperationName::SyncAggregate => {
+                let input: SyncAggregate = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::SyncAggregate(input)
+            }
+            OperationName::VoluntaryExit => {
+                let input: SignedVoluntaryExit = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::SignedVoluntaryExit(input)
+            }
+            OperationName::Withdrawals => {
+                let input: ExecutionPayload = ream_lib::snappy::read_ssz_snappy(input_path)
+                    .expect("cannot find input asset or decode it");
+                OperationInput::ExecutionPayload(input)
+            }
+        };
+        let post_state_opt: Option<BeaconState> = {
+            if case_dir.join("pre.ssz_snappy").exists() {
+                let post_state: BeaconState =
+                    ream_lib::snappy::read_ssz_snappy(&case_dir.join("pre.ssz_snappy"))
+                        .expect("cannot find test asset(pre.ssz_snappy) or decode it");
+                Some(post_state)
+            } else {
+                None
+            }
+        };
 
-    if args.execute {
-        // Execute the program
-        let (output, report) = client.execute(REAM_ELF, &stdin).run().unwrap();
-        println!("Program executed successfully.");
+        // Setup the prover client.
+        let client = ProverClient::from_env();
 
-        // Decode the output
-        let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
+        // Setup the inputs.
+        let mut stdin = SP1Stdin::new();
+        stdin.write(&pre_state);
+        stdin.write(&input);
 
-        // Compare the output with the expected post state.
-        assert_eq!(result, post_state);
-        println!("Execution is correct!");
+        if args.execute {
+            // Execute the program
+            let (output, report) = client.execute(REAM_ELF, &stdin).run().unwrap();
+            println!("Program executed successfully.");
 
-        // Record the number of cycles executed.
-        println!("Number of cycles: {}", report.total_instruction_count());
-    } else {
-        // Setup the program for proving.
-        let (pk, vk) = client.setup(REAM_ELF);
+            // Decode the output
+            let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
 
-        // Generate the proof
-        let proof = client
-            .prove(&pk, &stdin)
-            .run()
-            .expect("failed to generate proof");
+            // Compare the output with the expected post state.
+            if let Some(post_state) = post_state_opt {
+                assert_eq!(result, post_state);
+                println!("Execution is correct!");
+            }
 
-        println!("Successfully generated proof!");
+            // Record the number of cycles executed.
+            println!("Number of cycles: {}", report.total_instruction_count());
+        } else {
+            // Setup the program for proving.
+            let (pk, vk) = client.setup(REAM_ELF);
 
-        // Verify the proof.
-        client.verify(&proof, &vk).expect("failed to verify proof");
-        println!("Successfully verified proof!");
+            // Generate the proof
+            let proof = client
+                .prove(&pk, &stdin)
+                .run()
+                .expect("failed to generate proof");
+
+            println!("Successfully generated proof!");
+
+            // Verify the proof.
+            client.verify(&proof, &vk).expect("failed to verify proof");
+            println!("Successfully verified proof!");
+        }
     }
 }

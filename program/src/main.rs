@@ -5,7 +5,8 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
-use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState};
+use ream_consensus::deneb::beacon_state::BeaconState;
+use ream_lib::input::OperationInput;
 use ssz::Encode;
 
 pub fn main() {
@@ -20,15 +21,65 @@ pub fn main() {
     println!("cycle-tracker-end: read-pre-state");
 
     println!("cycle-tracker-start: read-block");
-    let block = sp1_zkvm::io::read::<BeaconBlock>();
+    let input = sp1_zkvm::io::read::<OperationInput>();
     println!("cycle-tracker-end: read-block");
 
     // Main logic of the program.
     // State transition of the beacon state.
 
-    println!("cycle-tracker-start: process-block-header");
-    let _ = pre_state.process_block_header(&block);
-    println!("cycle-tracker-end: process-block-header");
+    match input {
+        OperationInput::Attestation(attestation) => {
+            println!("cycle-tracker-start: process-attestation");
+            let _ = pre_state.process_attestation(&attestation);
+            println!("cycle-tracker-end: process-attestation");
+        }
+        OperationInput::AttesterSlashing(attester_slashing) => {
+            println!("cycle-tracker-start: process-attester-slashing");
+            let _ = pre_state.process_attester_slashing(&attester_slashing);
+            println!("cycle-tracker-end: process-attester-slashing");
+        }
+        OperationInput::BeaconBlock(block) => {
+            println!("cycle-tracker-start: process-block-header");
+            let _ = pre_state.process_block_header(&block);
+            println!("cycle-tracker-end: process-block-header");
+        }
+        OperationInput::SignedBLSToExecutionChange(bls_change) => {
+            println!("cycle-tracker-start: process-bls-to-execution-change");
+            let _ = pre_state.process_bls_to_execution_change(&bls_change);
+            println!("cycle-tracker-end: process-bls-to-execution-change");
+        }
+        OperationInput::Deposit(deposit) => {
+            println!("cycle-tracker-start: process-deposit");
+            let _ = pre_state.process_deposit(&deposit);
+            println!("cycle-tracker-end: process-deposit");
+        }
+        OperationInput::BeaconBlockBody(_block_body) => {
+            panic!("Not implemented");
+            // println!("cycle-tracker-start: process-execution-payload");
+            // let _ = pre_state.process_execution_payload(&block_body);
+            // println!("cycle-tracker-end: process-execution-payload");
+        }
+        OperationInput::ProposerSlashing(proposer_slashing) => {
+            println!("cycle-tracker-start: process-proposer-slashing");
+            let _ = pre_state.process_proposer_slashing(&proposer_slashing);
+            println!("cycle-tracker-end: process-proposer-slashing");
+        }
+        OperationInput::SyncAggregate(sync_aggregate) => {
+            println!("cycle-tracker-start: process-sync-aggregate");
+            let _ = pre_state.process_sync_aggregate(&sync_aggregate);
+            println!("cycle-tracker-end: process-sync-aggregate");
+        }
+        OperationInput::SignedVoluntaryExit(voluntary_exit) => {
+            println!("cycle-tracker-start: process-voluntary-exit");
+            let _ = pre_state.process_voluntary_exit(&voluntary_exit);
+            println!("cycle-tracker-end: process-voluntary-exit");
+        }
+        OperationInput::ExecutionPayload(execution_payload) => {
+            println!("cycle-tracker-start: process-withdrawals");
+            let _ = pre_state.process_withdrawals(&execution_payload);
+            println!("cycle-tracker-end: process-withdrawals");
+        }
+    }
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.
