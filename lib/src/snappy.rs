@@ -1,10 +1,6 @@
-use std::path::Path;
-
 use snap::raw::Decoder;
 
-pub fn read_ssz_snappy<T: ssz::Decode>(path: &Path) -> Option<T> {
-    let ssz_snappy = std::fs::read(path).ok()?;
+pub fn decode_snappy(raw_bytes: &[u8]) -> Result<Vec<u8>, snap::Error> {
     let mut decoder = Decoder::new();
-    let ssz = decoder.decompress_vec(&ssz_snappy).unwrap();
-    T::from_ssz_bytes(&ssz).ok()
+    decoder.decompress_vec(raw_bytes)
 }

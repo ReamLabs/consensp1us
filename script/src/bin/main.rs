@@ -1,35 +1,11 @@
-//! An end-to-end example of using the SP1 SDK to generate a proof of a program that can be executed
-//! or have a core proof generated.
-//!
-//! You can run this script using the following command:
-//! ```shell
-//! RUST_LOG=info cargo run --release -- --execute
-//! ```
-//! or
-//! ```shell
-//! RUST_LOG=info cargo run --release -- --prove
-//! ```
-
 use clap::Parser;
 use cli::operation::OperationName;
-use ream_consensus::{
-    attestation::Attestation,
-    attester_slashing::AttesterSlashing,
-    bls_to_execution_change::SignedBLSToExecutionChange,
-    deneb::{
-        beacon_block::BeaconBlock, beacon_block_body::BeaconBlockBody, beacon_state::BeaconState,
-        execution_payload::ExecutionPayload,
-    },
-    deposit::Deposit,
-    proposer_slashing::ProposerSlashing,
-    sync_aggregate::SyncAggregate,
-    voluntary_exit::SignedVoluntaryExit,
-};
+use ream_consensus::deneb::beacon_state::BeaconState;
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
 
 mod cli;
 
-use ream_lib::input::OperationInput;
+use ream_lib::{file::read_file, input::OperationInput};
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const REAM_ELF: &[u8] = include_elf!("ream-operations");
@@ -99,68 +75,32 @@ fn main() {
         let case_dir = &base_dir.join(test_case);
         let input_path = &case_dir.join(format!("{}.ssz_snappy", operation_name.to_input_name()));
 
-        let pre_state: BeaconState =
-            ream_lib::snappy::read_ssz_snappy(&case_dir.join("pre.ssz_snappy"))
-                .expect("cannot find test asset(pre.ssz_snappy) or decode it");
+        let pre_state: BeaconState = read_file(&case_dir.join("pre.ssz_snappy"));
         let input = match operation_name {
-            OperationName::Attestation => {
-                let input: Attestation = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::Attestation(input)
-            }
+            OperationName::Attestation => OperationInput::Attestation(read_file(input_path)),
             OperationName::AttesterSlashing => {
-                let input: AttesterSlashing = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::AttesterSlashing(input)
+                OperationInput::AttesterSlashing(read_file(input_path))
             }
-            OperationName::BlockHeader => {
-                let input: BeaconBlock = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::BeaconBlock(input)
-            }
+            OperationName::BlockHeader => OperationInput::BeaconBlock(read_file(input_path)),
             OperationName::BLSToExecutionChange => {
-                let input: SignedBLSToExecutionChange =
-                    ream_lib::snappy::read_ssz_snappy(input_path)
-                        .expect("cannot find input asset or decode it");
-                OperationInput::SignedBLSToExecutionChange(input)
+                OperationInput::SignedBLSToExecutionChange(read_file(input_path))
             }
-            OperationName::Deposit => {
-                let input: Deposit = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::Deposit(input)
-            }
+            OperationName::Deposit => OperationInput::Deposit(read_file(input_path)),
             OperationName::ExecutionPayload => {
-                let input: BeaconBlockBody = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::BeaconBlockBody(input)
+                OperationInput::BeaconBlockBody(read_file(input_path))
             }
             OperationName::ProposerSlashing => {
-                let input: ProposerSlashing = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::ProposerSlashing(input)
+                OperationInput::ProposerSlashing(read_file(input_path))
             }
-            OperationName::SyncAggregate => {
-                let input: SyncAggregate = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::SyncAggregate(input)
-            }
+            OperationName::SyncAggregate => OperationInput::SyncAggregate(read_file(input_path)),
             OperationName::VoluntaryExit => {
-                let input: SignedVoluntaryExit = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::SignedVoluntaryExit(input)
+                OperationInput::SignedVoluntaryExit(read_file(input_path))
             }
-            OperationName::Withdrawals => {
-                let input: ExecutionPayload = ream_lib::snappy::read_ssz_snappy(input_path)
-                    .expect("cannot find input asset or decode it");
-                OperationInput::ExecutionPayload(input)
-            }
+            OperationName::Withdrawals => OperationInput::ExecutionPayload(read_file(input_path)),
         };
         let post_state_opt: Option<BeaconState> = {
             if case_dir.join("post.ssz_snappy").exists() {
-                let post_state: BeaconState =
-                    ream_lib::snappy::read_ssz_snappy(&case_dir.join("pre.ssz_snappy"))
-                        .expect("cannot find test asset(pre.ssz_snappy) or decode it");
-                Some(post_state)
+                Some(read_file(&case_dir.join("post.ssz_snappy")))
             } else {
                 None
             }
@@ -182,9 +122,10 @@ fn main() {
             // Decode the output
             let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
 
+            // Match `post_state_opt`: some test cases should not mutate beacon state.
             match post_state_opt {
                 Some(post_state) => {
-                assert_eq!(result, post_state);
+                    assert_eq!(result, post_state);
                     println!("Execution is correct!: State mutated");
                 }
                 None => {
