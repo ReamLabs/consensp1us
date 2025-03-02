@@ -9,6 +9,7 @@ use ream_consensus::deneb::beacon_state::BeaconState;
 use ream_lib::input::OperationInput;
 use ssz::Encode;
 
+#[sp1_derive::cycle_tracker]
 pub fn main() {
     // Read an input to the program.
     //

@@ -3821,6 +3821,7 @@ dependencies = [
  "ethereum_ssz",
  "ream-consensus",
  "ream-lib",
+ "sp1-derive",
  "sp1-zkvm",
 ]
 
