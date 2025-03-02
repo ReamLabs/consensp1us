@@ -15,7 +15,7 @@ use ream_consensus::deneb::{beacon_block::BeaconBlock, beacon_state::BeaconState
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
-pub const REAM_ELF: &[u8] = include_elf!("ream-program");
+pub const REAM_ELF: &[u8] = include_elf!("ream-operations");
 
 /// The arguments for the command.
 #[derive(Parser, Debug)]
