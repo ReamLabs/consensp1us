@@ -156,7 +156,7 @@ fn main() {
             }
         };
         let post_state_opt: Option<BeaconState> = {
-            if case_dir.join("pre.ssz_snappy").exists() {
+            if case_dir.join("post.ssz_snappy").exists() {
                 let post_state: BeaconState =
                     ream_lib::snappy::read_ssz_snappy(&case_dir.join("pre.ssz_snappy"))
                         .expect("cannot find test asset(pre.ssz_snappy) or decode it");
@@ -182,10 +182,15 @@ fn main() {
             // Decode the output
             let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
 
-            // Compare the output with the expected post state.
-            if let Some(post_state) = post_state_opt {
+            match post_state_opt {
+                Some(post_state) => {
                 assert_eq!(result, post_state);
-                println!("Execution is correct!");
+                    println!("Execution is correct!: State mutated");
+                }
+                None => {
+                    assert_eq!(result, pre_state);
+                    println!("Execution is correct!: State should not be mutated");
+                }
             }
 
             // Record the number of cycles executed.
