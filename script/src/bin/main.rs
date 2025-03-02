@@ -195,6 +195,7 @@ fn main() {
 
             // Record the number of cycles executed.
             println!("Number of cycles: {}", report.total_instruction_count());
+            println!("Number of syscall count: {}", report.total_syscall_count());
         } else {
             // Setup the program for proving.
             let (pk, vk) = client.setup(REAM_ELF);
