@@ -27,10 +27,29 @@ To run the program without generating a proof:
 
 ```sh
 cd script
-cargo run --release -- --execute
+make download
+cargo run --release -- --execute --operation_name <OPERATION_NAME>
+```
+
+```
+possible values for OPERATION_NAME: attestation, attester_slashing, block_header, bls_to_execution_change, deposit, execution_payload, proposer_slashing, sync_aggregate, voluntary_exit, withdrawals
 ```
 
 This will execute the program and display the output.
+
+### Generate benchmarks for execution
+
+```sh
+cd script
+make download
+make run-<OPERATION_NAME>
+```
+
+```sh
+OPERATIONS = attestation attester_slashing block_header bls_to_execution_change deposit execution_payload proposer_slashing sync_aggregate voluntary_exit withdrawals
+```
+
+This will execute the program and generate benchmarks (especially for cycles) in `./script/summaries` directory.
 
 ### Generate a Core Proof
 
@@ -38,5 +57,5 @@ To generate a core proof for your program:
 
 ```sh
 cd script
-cargo run --release -- --prove
+cargo run --release -- --prove --operation_name <OPERATION_NAME>
 ```

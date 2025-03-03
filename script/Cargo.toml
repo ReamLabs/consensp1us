@@ -12,6 +12,7 @@ path = "src/bin/main.rs"
 sp1-sdk = "4.0.0"
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0.200", default-features = false, features = ["derive"] }
+derive_more = { version = "2.0.1", features = ["full"] }
 clap = { version = "4.0", features = ["derive", "env"] }
 tracing = { workspace = true }
 hex = "0.4.3"

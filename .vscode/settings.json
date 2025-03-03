@@ -34,4 +34,5 @@
         "editor.formatOnSave": true,
         "editor.hover.enabled": true
     },
+    "rust-analyzer.trace.server": "verbose",
 }
