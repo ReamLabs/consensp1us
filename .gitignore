@@ -21,5 +21,6 @@ pgo-data.profdata
 # EF test data
 script/mainnet/
 
-# Logs
+# Logs and Summaries
 **/logs/**
+**/summaries/**

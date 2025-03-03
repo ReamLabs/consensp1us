@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INPUT_FILE=$1
-OUTPUT_FILE= echo $INPUT_FILE | awk -F/ '{print $1 "/" "sorted_" $2}'
+OUTPUT_FILE=$(echo $INPUT_FILE | awk -F/ '{print $1 "/" "sorted_" $2}')
 
 HEADER=$(head -n 2 "$INPUT_FILE")
 
