@@ -30,6 +30,9 @@ struct Args {
 
     #[clap(flatten)]
     operation: cli::operation::OperationArgs,
+
+    #[clap(long)]
+    excluded_cases: Vec<String>,
 }
 
 fn main() {
@@ -58,8 +61,9 @@ fn main() {
         std::process::exit(1);
     }
 
-    let fork: cli::fork::Fork = args.fork.fork;
-    let operation_name: cli::operation::OperationName = args.operation.operation_name;
+    let fork = args.fork.fork;
+    let operation_name = args.operation.operation_name;
+    let excluded_cases = args.excluded_cases;
 
     // Load the test assets.
     // These assets are from consensus-specs repo.
@@ -71,7 +75,13 @@ fn main() {
 
     let test_cases = ream_lib::file::get_test_cases(&base_dir);
     for test_case in test_cases {
+        if excluded_cases.contains(&test_case) {
+            info!("Skipping test case: {}", test_case);
+            continue;
+        }
+
         info!("{}", "-".repeat(50));
+        info!("[{}] Test case: {}", operation_name, test_case);
 
         let case_dir = &base_dir.join(&test_case);
         let input_path = &case_dir.join(format!("{}.ssz_snappy", operation_name.to_input_name()));
