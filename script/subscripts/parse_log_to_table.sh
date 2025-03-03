@@ -3,7 +3,7 @@
 OPERATION=$1
 
 LOG_FILE="logs/execution_$OPERATION.log"
-OUTPUT_FILE="summary_$OPERATION.md"
+OUTPUT_FILE="summaries/summary_$OPERATION.md"
 
 # Table Header
 echo '| Operation | Test Case | Total Cycles | Syscall Count | Read Pre-State | Read Operation | Process | Convert SSZ | Commit |' > $OUTPUT_FILE
@@ -71,5 +71,3 @@ BEGIN {
     commit = 0;
 }
 ' $LOG_FILE
-
-cat $OUTPUT_FILE
