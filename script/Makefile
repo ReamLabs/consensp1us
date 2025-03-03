@@ -1,23 +1,29 @@
 TARGET = mainnet.tar.gz
 EXTRACT_DIR = mainnet
-SCRIPT = ./subscripts/download_ef_data.sh
+LOGS_DIR = logs
 
-.PHONY: all download test clean
+DOWNLOAD_SCRIPT = ./subscripts/download_ef_data.sh
+PARSE_SCRIPT = ./subscripts/parse_log_to_table.sh
 
-all: download test
+.PHONY: all download run clean
+
+all: download run
 
 download:
 	@echo "Running download script..."
-	@chmod +x $(SCRIPT)
-	@$(SCRIPT)
+	@chmod +x $(DOWNLOAD_SCRIPT)
+	@$(DOWNLOAD_SCRIPT)
 
-test: $(EXTRACT_DIR)
-	@echo "Running tests..."
-	@cargo test --release --features ef-tests
-	@echo "Tests complete."
+run: $(EXTRACT_DIR)
+	@mkdir -p $(LOGS_DIR)
+	@echo "Running benchmarks..."
+	@NO_COLOR=1 cargo run --release -- --execute -o attestation &> logs/execution_attestation.log
+	@echo "Execution complete."
+	@$(PARSE_SCRIPT) attestation
 
 clean:
-	@echo "Cleaning up downloaded and extracted files..."
+	@echo "Cleaning up downloaded/execution files..."
 	@rm -f $(TARGET)
 	@rm -rf $(EXTRACT_DIR)
+	@rm -rf $(LOGS_DIR)
 	@echo "Clean up complete."

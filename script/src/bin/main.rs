@@ -1,11 +1,12 @@
 use clap::Parser;
-use cli::operation::OperationName;
-use ream_consensus::deneb::beacon_state::BeaconState;
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
+use tracing::{error, info};
+
+use ream_consensus::deneb::beacon_state::BeaconState;
+use ream_lib::{file::read_file, input::OperationInput};
 
 mod cli;
-
-use ream_lib::{file::read_file, input::OperationInput};
+use cli::operation::OperationName;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const REAM_ELF: &[u8] = include_elf!("ream-operations");
@@ -53,7 +54,7 @@ fn main() {
     let args = Args::parse();
 
     if args.execute == args.prove {
-        eprintln!("Error: You must specify either --execute or --prove");
+        error!("Error: You must specify either --execute or --prove");
         std::process::exit(1);
     }
 
@@ -70,9 +71,9 @@ fn main() {
 
     let test_cases = ream_lib::file::get_test_cases(&base_dir);
     for test_case in test_cases {
-        println!("[{}] Test case: {}", operation_name, test_case);
+        info!("{}", "-".repeat(50));
 
-        let case_dir = &base_dir.join(test_case);
+        let case_dir = &base_dir.join(&test_case);
         let input_path = &case_dir.join(format!("{}.ssz_snappy", operation_name.to_input_name()));
 
         let pre_state: BeaconState = read_file(&case_dir.join("pre.ssz_snappy"));
@@ -117,7 +118,7 @@ fn main() {
         if args.execute {
             // Execute the program
             let (output, report) = client.execute(REAM_ELF, &stdin).run().unwrap();
-            println!("Program executed successfully.");
+            info!("Program executed successfully.");
 
             // Decode the output
             let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
@@ -126,17 +127,23 @@ fn main() {
             match post_state_opt {
                 Some(post_state) => {
                     assert_eq!(result, post_state);
-                    println!("Execution is correct!: State mutated");
+                    info!("Execution is correct!: State mutated");
                 }
                 None => {
                     assert_eq!(result, pre_state);
-                    println!("Execution is correct!: State should not be mutated");
+                    info!("Execution is correct!: State should not be mutated");
                 }
             }
 
             // Record the number of cycles executed.
-            println!("Number of cycles: {}", report.total_instruction_count());
-            println!("Number of syscall count: {}", report.total_syscall_count());
+            info!("----- Cycle Tracker -----");
+            info!("[{}] Test case: {}", operation_name, test_case);
+            info!("Number of cycles: {}", report.total_instruction_count());
+            info!("Number of syscall count: {}", report.total_syscall_count());
+            for (key, value) in report.cycle_tracker.iter() {
+                info!("{}: {}", key, value);
+            }
+            info!("----- Cycle Tracker End -----");
         } else {
             // Setup the program for proving.
             let (pk, vk) = client.setup(REAM_ELF);
@@ -147,11 +154,12 @@ fn main() {
                 .run()
                 .expect("failed to generate proof");
 
-            println!("Successfully generated proof!");
+            info!("Successfully generated proof!");
 
             // Verify the proof.
             client.verify(&proof, &vk).expect("failed to verify proof");
-            println!("Successfully verified proof!");
+            info!("Successfully verified proof!");
         }
+        info!("{}", "-".repeat(50));
     }
 }
