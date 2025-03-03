@@ -7,23 +7,29 @@ DOWNLOAD_SCRIPT = ./subscripts/download_ef_data.sh
 PARSE_SCRIPT = ./subscripts/parse_log_to_table.sh
 SORT_SCRIPT = ./subscripts/sort_table.sh
 
-.PHONY: all download run clean
+OPERATIONS = attestation attester_slashing block_header bls_to_execution_change deposit execution_payload proposer_slashing sync_aggregate voluntary_exit withdrawals
 
-all: download run
+.PHONY: all download run clean $(addprefix run-, $(OPERATIONS))
+
+all: download run-attestation
 
 download:
 	@echo "Running download script..."
 	@chmod +x $(DOWNLOAD_SCRIPT)
 	@$(DOWNLOAD_SCRIPT)
 
-run: $(EXTRACT_DIR)
+run:
+	@echo "Specify an operation: $(OPERATIONS)"
+	@exit 1
+
+$(addprefix run-, $(OPERATIONS)): run-%: $(EXTRACT_DIR)
 	@mkdir -p $(LOGS_DIR)
 	@mkdir -p $(SUMMARIES_DIR)
-	@echo "Running benchmarks..."
-	@NO_COLOR=1 cargo run --release -- --execute -o attestation --excluded-cases multi_proposer_index_iterations &> logs/execution_attestation.log
-	@echo "Execution complete."
-	@$(PARSE_SCRIPT) attestation
-	@$(SORT_SCRIPT) $(SUMMARIES_DIR)/summary_attestation.md
+	@echo "Running benchmarks for $*..."
+	@NO_COLOR=1 cargo run --release -- --execute -o $* --excluded-cases multi_proposer_index_iterations &> $(LOGS_DIR)/execution_$*.log
+	@echo "Execution complete for $*."
+	@$(PARSE_SCRIPT) $*
+	@$(SORT_SCRIPT) $(SUMMARIES_DIR)/summary_$*.md
 
 clean:
 	@echo "Cleaning up downloaded/execution files..."
