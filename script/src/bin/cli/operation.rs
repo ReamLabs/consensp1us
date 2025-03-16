@@ -4,7 +4,7 @@ use derive_more::Display;
 #[derive(Debug, Clone, Parser)]
 pub struct OperationArgs {
     #[clap(long, short)]
-    pub operation_name: OperationName,
+    pub operation_name: Option<OperationName>,
 }
 
 #[derive(ValueEnum, Debug, Clone, Display)]
