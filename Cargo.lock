@@ -847,7 +847,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -2622,7 +2622,7 @@ dependencies = [
 [[package]]
 name = "kzg"
 version = "0.1.0"
-source = "git+https://github.com/grandinetech/rust-kzg#6ea2a2ad93ecac70d627edc91334ccb5f4ecd4fb"
+source = "git+https://github.com/grandinetech/rust-kzg#d98686ae55adf4750e2b155e3f298f79dbc4d6b5"
 dependencies = [
  "sha2",
  "siphasher",
@@ -2662,7 +2662,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.52.6",
+ "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -3613,7 +3613,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "157c5a9d7ea5c2ed2d9fb8f495b64759f7816c7eaea54ba3978f0d63000162e3"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -3764,7 +3764,7 @@ dependencies = [
 [[package]]
 name = "ream-bls"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#fe6bc6133b9082381baafe54be7a9a694e5c328b"
+source = "git+https://github.com/ReamLabs/ream#d05026b3a0b741237bbac6d7effc3ed4deeb69ee"
 dependencies = [
  "alloy-primitives",
  "anyhow",
@@ -3782,7 +3782,7 @@ dependencies = [
 [[package]]
 name = "ream-consensus"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#fe6bc6133b9082381baafe54be7a9a694e5c328b"
+source = "git+https://github.com/ReamLabs/ream#d05026b3a0b741237bbac6d7effc3ed4deeb69ee"
 dependencies = [
  "alloy-consensus 0.11.1",
  "alloy-primitives",
