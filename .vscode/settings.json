@@ -1,6 +1,6 @@
 {
     "rust-analyzer.linkedProjects": [
-        "program/Cargo.toml",
+        "program/operations/Cargo.toml",
         "script/Cargo.toml"
     ],
     "rust-analyzer.check.overrideCommand": [

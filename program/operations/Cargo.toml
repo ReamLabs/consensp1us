@@ -13,4 +13,4 @@ ethereum_ssz = { workspace = true }
 
 # Ream dependencies
 ream-consensus = { workspace = true }
-ream-lib = { path = "../lib" }
+ream-lib = { path = "../../lib" }

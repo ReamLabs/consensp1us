@@ -26,9 +26,9 @@ $(addprefix run-, $(OPERATIONS)): run-%: $(EXTRACT_DIR)
 	@mkdir -p $(LOGS_DIR)
 	@mkdir -p $(SUMMARIES_DIR)
 	@echo "Running benchmarks for $*..."
-	@NO_COLOR=1 cargo run --release -- --execute -o $* \
-		--excluded-cases multi_proposer_index_iterations \ # attestation
-		--excluded-cases random_with_exits_with_duplicates \ # sync_aggregate
+	@NO_COLOR=1 cargo run --release -- --execute --ef-test -o $* \
+		--excluded-cases multi_proposer_index_iterations \
+		--excluded-cases random_with_exits_with_duplicates \
 		&> $(LOGS_DIR)/execution_$*.log
 	@echo "Execution complete for $*."
 	@$(PARSE_SCRIPT) $*

@@ -18,7 +18,7 @@ pub fn main() {
     // NOTE: BeaconState/OperationInput should implement Serialize & Deserialize trait.
 
     println!("cycle-tracker-report-start: read-pre-state");
-    let mut pre_state = sp1_zkvm::io::read::<BeaconState>();
+    let mut pre_state: BeaconState = sp1_zkvm::io::read();
     println!("cycle-tracker-report-end: read-pre-state");
 
     println!("cycle-tracker-report-start: read-operation-input");
