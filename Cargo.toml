@@ -3,7 +3,7 @@ members = ["lib", "program", "script"]
 resolver = "2"
 
 [workspace.dependencies]
-ethereum_ssz = "0.8.2"
+ethereum_ssz = "0.9"
 tracing = "0.1.40"
 ream-consensus = { git = "https://github.com/ReamLabs/ream", package = "ream-consensus" }
 

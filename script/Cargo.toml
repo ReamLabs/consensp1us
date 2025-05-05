@@ -1,7 +1,7 @@
 [package]
 version = "0.1.0"
 name = "ream-script"
-edition = "2021"
+edition = "2024"
 default-run = "ream"
 
 [[bin]]

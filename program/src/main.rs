@@ -5,7 +5,7 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
-use ream_consensus::deneb::beacon_state::BeaconState;
+use ream_consensus::electra::beacon_state::BeaconState;
 use ream_lib::input::OperationInput;
 use ssz::Encode;
 

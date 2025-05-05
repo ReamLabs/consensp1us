@@ -1,8 +1,8 @@
 use clap::Parser;
-use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
+use sp1_sdk::{ProverClient, SP1Stdin, include_elf};
 use tracing::{error, info};
 
-use ream_consensus::deneb::beacon_state::BeaconState;
+use ream_consensus::electra::beacon_state::BeaconState;
 use ream_lib::{file::read_file, input::OperationInput};
 
 mod cli;
@@ -46,7 +46,9 @@ fn main() {
     }
 
     if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", "info");
+        unsafe {
+            std::env::set_var("RUST_LOG", "info");
+        }
     }
 
     // Setup the logger.

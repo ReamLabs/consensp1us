@@ -2,11 +2,11 @@ use ream_consensus::{
     attestation::Attestation,
     attester_slashing::AttesterSlashing,
     bls_to_execution_change::SignedBLSToExecutionChange,
-    deneb::{
+    deposit::Deposit,
+    electra::{
         beacon_block::BeaconBlock, beacon_block_body::BeaconBlockBody,
         execution_payload::ExecutionPayload,
     },
-    deposit::Deposit,
     proposer_slashing::ProposerSlashing,
     sync_aggregate::SyncAggregate,
     voluntary_exit::SignedVoluntaryExit,
