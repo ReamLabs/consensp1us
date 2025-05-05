@@ -4,7 +4,7 @@ TARGET="mainnet.tar.gz"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 EXTRACT_DIR="$PARENT_DIR/mainnet"
-LATEST_RELEASE_URL="https://api.github.com/repos/ethereum/consensus-spec-tests/releases/latest"
+RELEASE_URL="https://api.github.com/repos/ethereum/consensus-spec-tests/releases"
 
 download_and_extract() {
     if [ -d "$EXTRACT_DIR" ]; then
@@ -12,8 +12,8 @@ download_and_extract() {
         return 0
     fi
 
-    echo "Fetching the latest release URL for $TARGET..."
-    DOWNLOAD_URL=$(curl -s "$LATEST_RELEASE_URL" | jq -r ".assets[] | select(.name == \"$TARGET\") | .browser_download_url")
+    echo "Fetching the latest release URL (including pre-releases) for $TARGET..."
+    DOWNLOAD_URL=$(curl -s "$RELEASE_URL" | jq -r ".[0].assets[] | select(.name == \"$TARGET\") | .browser_download_url")
 
     if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" == "null" ]; then
         echo "Failed to fetch download URL for $TARGET."
