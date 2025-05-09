@@ -1,0 +1,12 @@
+[package]
+version = "0.1.0"
+name = "ream-slashings-reset"
+edition = "2024"
+
+[dependencies]
+# SP1 dependencies
+sp1-zkvm = "4.0.0"
+sp1-derive = "4.0.0"
+
+# Ream dependencies
+ream-consensus = { workspace = true }

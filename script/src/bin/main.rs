@@ -1,9 +1,15 @@
 use clap::Parser;
 use sp1_sdk::{ProverClient, SP1Stdin, include_elf};
-use ssz::{Decode, Encode};
 use tracing::{error, info};
+use tree_hash::TreeHash;
 
-use ream_consensus::electra::{beacon_block::SignedBeaconBlock, beacon_state::BeaconState};
+use ream_consensus::{
+    constants::{BEACON_STATE_MERKLE_DEPTH, BEACON_STATE_SLASHINGS_INDEX, BEACON_STATE_SLOT_INDEX},
+    electra::beacon_state::BeaconState,
+    view::{
+        BeaconStateView, PartialBeaconState, PartialBeaconStateBuilder, SLASHINGS_GENERALIZED_INDEX,
+    },
+};
 use ream_lib::{file::read_file, input::OperationInput};
 
 mod cli;
@@ -11,6 +17,7 @@ use cli::operation::OperationName;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const OPERATIONS_ELF: &[u8] = include_elf!("ream-operations");
+pub const SLASHINGS_RESET_ELF: &[u8] = include_elf!("ream-slashings-reset");
 
 /// The arguments for the command.
 #[derive(Parser, Debug)]
@@ -46,6 +53,9 @@ struct Args {
     state_path: Option<String>,
 
     #[clap(long, requires = "replay")]
+    expected_post_path: Option<String>,
+
+    #[clap(long, requires = "replay")]
     block_path: Option<String>,
 }
 
@@ -75,7 +85,68 @@ fn main() {
 
     if args.replay {
         info!("Executing with replay test...");
-        todo!();
+
+        let mut pre_state: BeaconState = read_file(&std::path::PathBuf::from(
+            args.state_path.unwrap_or_default(),
+        ));
+        let expected_post: BeaconState = read_file(&std::path::PathBuf::from(
+            args.expected_post_path.unwrap_or_default(),
+        ));
+        let root = pre_state.tree_hash_root();
+
+        let all_leaves = pre_state.merkle_leaves();
+        let tree = ream_merkle::merkle_tree(&all_leaves, BEACON_STATE_MERKLE_DEPTH)
+            .expect("Failed to create merkle tree");
+
+        let target_indices = vec![BEACON_STATE_SLOT_INDEX, BEACON_STATE_SLASHINGS_INDEX];
+        let multiproof =
+            ream_merkle::multiproof::Multiproof::generate::<BEACON_STATE_MERKLE_DEPTH>(
+                &tree,
+                &target_indices,
+            )
+            .expect("Failed to generate multiproof");
+
+        let builder = PartialBeaconStateBuilder::from_root(root)
+            .with_multiproof(multiproof)
+            .with_slot(pre_state.slot)
+            .with_slashings(&pre_state.slashings);
+
+        // Setup the prover client.
+        let client = ProverClient::from_env();
+
+        // Setup the inputs.
+        let mut stdin = SP1Stdin::new();
+
+        stdin.write(&builder);
+
+        // Execute the program
+        let (output, report) = client.execute(SLASHINGS_RESET_ELF, &stdin).run().unwrap();
+        info!("Program executed successfully.");
+
+        // Decode the output
+        let result: PartialBeaconState = bincode::deserialize(output.as_slice()).unwrap();
+
+        for &mutated in result.dirty.iter() {
+            match mutated {
+                SLASHINGS_GENERALIZED_INDEX => {
+                    pre_state.slashings = result.slashings().unwrap().clone();
+                }
+                _ => {
+                    panic!("Unexpected mutated index: {}", mutated);
+                }
+            }
+        }
+
+        assert_eq!(expected_post.tree_hash_root(), pre_state.tree_hash_root());
+
+        // Record the number of cycles executed.
+        info!("----- Cycle Tracker -----");
+        info!("Number of cycles: {}", report.total_instruction_count());
+        info!("Number of syscall count: {}", report.total_syscall_count());
+        for (key, value) in report.cycle_tracker.iter() {
+            info!("{}: {}", key, value);
+        }
+        info!("----- Cycle Tracker End -----");
     }
 
     if args.ef_test {
