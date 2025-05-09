@@ -35,5 +35,9 @@ jobs:
 
       - name: Build SP1 program
         run: |
-          cd program
+          cd program/operations
+          ~/.sp1/bin/cargo-prove prove build
+
+          cd -
+          cd program/slashings_reset
           ~/.sp1/bin/cargo-prove prove build

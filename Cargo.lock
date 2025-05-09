@@ -1731,7 +1731,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3721,7 +3721,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3842,7 +3842,7 @@ dependencies = [
 [[package]]
 name = "ream-bls"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
 dependencies = [
  "alloy-primitives 1.1.0",
  "anyhow",
@@ -3860,7 +3860,7 @@ dependencies = [
 [[package]]
 name = "ream-consensus"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
 dependencies = [
  "alloy-consensus 0.15.9",
  "alloy-primitives 1.1.0",
@@ -3898,11 +3898,12 @@ dependencies = [
 [[package]]
 name = "ream-merkle"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
 dependencies = [
  "alloy-primitives 1.1.0",
  "anyhow",
  "ethereum_hashing",
+ "serde",
 ]
 
 [[package]]
@@ -3920,6 +3921,7 @@ dependencies = [
 name = "ream-script"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "clap",
  "derive_more 2.0.1",
  "dotenv",
@@ -3927,11 +3929,22 @@ dependencies = [
  "hex",
  "ream-consensus",
  "ream-lib",
+ "ream-merkle",
  "serde",
  "serde_json",
  "sp1-build",
  "sp1-sdk",
  "tracing",
+ "tree_hash",
+]
+
+[[package]]
+name = "ream-slashings-reset"
+version = "0.1.0"
+dependencies = [
+ "ream-consensus",
+ "sp1-derive",
+ "sp1-zkvm",
 ]
 
 [[package]]
@@ -4189,7 +4202,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5246,7 +5259,7 @@ dependencies = [
  "getrandom 0.3.1",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
