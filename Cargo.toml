@@ -5,8 +5,8 @@ resolver = "2"
 [workspace.dependencies]
 ethereum_ssz = "0.9"
 tracing = "0.1.40"
-ream-consensus = { git = "https://github.com/syjn99/ream", package = "ream-consensus", rev = "539ac3b414470a62e5d4857e89444a7a0e13aa5d" }
-ream-merkle = { git = "https://github.com/syjn99/ream", package = "ream-merkle", rev = "539ac3b414470a62e5d4857e89444a7a0e13aa5d" }
+ream-consensus = { git = "https://github.com/syjn99/ream", package = "ream-consensus", rev = "f5327406270b374b6caeaed05fc1549c5a21dd53" }
+ream-merkle = { git = "https://github.com/syjn99/ream", package = "ream-merkle", rev = "f5327406270b374b6caeaed05fc1549c5a21dd53" }
 
 [patch.crates-io]
 ethereum_hashing = { git = "https://github.com/ReamLabs/ethereum_hashing" }

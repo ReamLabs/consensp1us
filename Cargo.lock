@@ -3842,7 +3842,7 @@ dependencies = [
 [[package]]
 name = "ream-bls"
 version = "0.1.0"
-source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
+source = "git+https://github.com/syjn99/ream?rev=f5327406270b374b6caeaed05fc1549c5a21dd53#f5327406270b374b6caeaed05fc1549c5a21dd53"
 dependencies = [
  "alloy-primitives 1.1.0",
  "anyhow",
@@ -3860,7 +3860,7 @@ dependencies = [
 [[package]]
 name = "ream-consensus"
 version = "0.1.0"
-source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
+source = "git+https://github.com/syjn99/ream?rev=f5327406270b374b6caeaed05fc1549c5a21dd53#f5327406270b374b6caeaed05fc1549c5a21dd53"
 dependencies = [
  "alloy-consensus 0.15.9",
  "alloy-primitives 1.1.0",
@@ -3898,7 +3898,7 @@ dependencies = [
 [[package]]
 name = "ream-merkle"
 version = "0.1.0"
-source = "git+https://github.com/syjn99/ream?rev=539ac3b414470a62e5d4857e89444a7a0e13aa5d#539ac3b414470a62e5d4857e89444a7a0e13aa5d"
+source = "git+https://github.com/syjn99/ream?rev=f5327406270b374b6caeaed05fc1549c5a21dd53#f5327406270b374b6caeaed05fc1549c5a21dd53"
 dependencies = [
  "alloy-primitives 1.1.0",
  "anyhow",

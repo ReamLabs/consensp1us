@@ -4,11 +4,12 @@ use tracing::{error, info};
 use tree_hash::TreeHash;
 
 use ream_consensus::{
-    constants::{BEACON_STATE_MERKLE_DEPTH, BEACON_STATE_SLASHINGS_INDEX, BEACON_STATE_SLOT_INDEX},
-    electra::beacon_state::BeaconState,
-    view::{
-        BeaconStateView, PartialBeaconState, PartialBeaconStateBuilder, SLASHINGS_GENERALIZED_INDEX,
+    constants::{
+        BEACON_STATE_MERKLE_DEPTH, BEACON_STATE_SLASHINGS_GENERALIZED_INDEX,
+        BEACON_STATE_SLASHINGS_INDEX, BEACON_STATE_SLOT_INDEX,
     },
+    electra::beacon_state::BeaconState,
+    view::{PartialBeaconState, PartialBeaconStateBuilder, SlashingsView},
 };
 use ream_lib::{file::read_file, input::OperationInput};
 
@@ -128,7 +129,7 @@ fn main() {
 
         for &mutated in result.dirty.iter() {
             match mutated {
-                SLASHINGS_GENERALIZED_INDEX => {
+                BEACON_STATE_SLASHINGS_GENERALIZED_INDEX => {
                     pre_state.slashings = result.slashings().unwrap().clone();
                 }
                 _ => {
