@@ -5,8 +5,8 @@ edition = "2024"
 
 [dependencies]
 # SP1 dependencies
-sp1-zkvm = "4.0.0"
-sp1-derive = "4.0.0"
+sp1-zkvm = "5.2.1"
+sp1-derive = "5.2.1"
 
 # Ethereum dependencies
 ethereum_ssz = { workspace = true }

@@ -1,9 +1,8 @@
 use clap::Parser;
 use sp1_sdk::{ProverClient, SP1Stdin, include_elf};
-use ssz::{Decode, Encode};
 use tracing::{error, info};
 
-use ream_consensus::electra::{beacon_block::SignedBeaconBlock, beacon_state::BeaconState};
+use ream_consensus::electra::beacon_state::BeaconState;
 use ream_lib::{file::read_file, input::OperationInput};
 
 mod cli;

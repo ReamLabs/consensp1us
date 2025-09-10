@@ -8,7 +8,6 @@ sp1_zkvm::entrypoint!(main);
 use ream_consensus::electra::beacon_state::BeaconState;
 use ream_lib::input::OperationInput;
 use ssz::Encode;
-
 #[sp1_derive::cycle_tracker]
 pub fn main() {
     // Read an input to the program.
@@ -70,6 +69,7 @@ pub fn main() {
 
     println!("cycle-tracker-report-start: convert-to-ssz-bytes");
     let pre_state_bytes = pre_state.as_ssz_bytes();
+
     println!("cycle-tracker-report-end: convert-to-ssz-bytes");
 
     println!("cycle-tracker-report-start: commit");
