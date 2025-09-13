@@ -3,9 +3,14 @@ members = ["lib", "program/operations", "script"]
 resolver = "2"
 
 [workspace.dependencies]
+clap = { version = "4.0", features = ["derive", "env"] }
+derive_more = { version = "2.0", features = ["full"] }
 ethereum_ssz = "0.9"
+serde = { version = "1.0.200", default-features = false, features = ["derive"] }
 tracing = "0.1.40"
-ream-consensus = { git = "https://github.com/ReamLabs/ream", package = "ream-consensus" }
+
+# Ream dependencies
+ream-consensus = { git = "https://github.com/ReamLabs/ream", package = "ream-consensus-beacon", features = ["zkvm"] }
 
 [patch.crates-io]
 ethereum_hashing = { git = "https://github.com/ReamLabs/ethereum_hashing" }

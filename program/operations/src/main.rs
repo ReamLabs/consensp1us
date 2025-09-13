@@ -6,8 +6,24 @@
 sp1_zkvm::entrypoint!(main);
 
 use ream_consensus::electra::beacon_state::BeaconState;
+use ream_consensus::{
+    attestation::Attestation,
+    attester_slashing::AttesterSlashing,
+    bls_to_execution_change::SignedBLSToExecutionChange,
+    deposit::Deposit,
+    electra::{beacon_block::BeaconBlock, execution_payload::ExecutionPayload},
+    proposer_slashing::ProposerSlashing,
+    sync_aggregate::SyncAggregate,
+    voluntary_exit::SignedVoluntaryExit,
+};
 use ream_lib::input::OperationInput;
+use ream_lib::operation::OperationName;
 use ssz::Encode;
+
+fn deserialize<T: ssz::Decode>(ssz_bytes: &[u8]) -> T {
+    T::from_ssz_bytes(ssz_bytes).unwrap()
+}
+
 #[sp1_derive::cycle_tracker]
 pub fn main() {
     // Read an input to the program.
@@ -16,9 +32,13 @@ pub fn main() {
     // from the prover.
     // NOTE: BeaconState/OperationInput should implement Serialize & Deserialize trait.
 
-    println!("cycle-tracker-report-start: read-pre-state");
-    let mut pre_state: BeaconState = sp1_zkvm::io::read();
-    println!("cycle-tracker-report-end: read-pre-state");
+    println!("cycle-tracker-report-start: read-pre-state-bytes");
+    let pre_state_bytes: Vec<u8> = sp1_zkvm::io::read();
+    println!("cycle-tracker-report-end: read-pre-state-bytes");
+
+    println!("cycle-tracker-report-start: deserialize-pre-state");
+    let mut pre_state: BeaconState = deserialize(&pre_state_bytes);
+    println!("cycle-tracker-report-end: deserialize-pre-state");
 
     println!("cycle-tracker-report-start: read-operation-input");
     let input = sp1_zkvm::io::read::<OperationInput>();
@@ -28,36 +48,64 @@ pub fn main() {
     // State transition of the beacon state.
 
     println!("cycle-tracker-report-start: process-operation");
-    match input {
-        OperationInput::Attestation(attestation) => {
+    match input.op {
+        OperationName::Attestation => {
+            println!("cycle-tracker-report-start: deserialize-attestation");
+            let attestation: Attestation = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-attestation");
             let _ = pre_state.process_attestation(&attestation);
         }
-        OperationInput::AttesterSlashing(attester_slashing) => {
+        OperationName::AttesterSlashing => {
+            println!("cycle-tracker-report-start: deserialize-attester-slashing");
+            let attester_slashing: AttesterSlashing = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-attester-slashing");
             let _ = pre_state.process_attester_slashing(&attester_slashing);
         }
-        OperationInput::BeaconBlock(block) => {
+        OperationName::BlockHeader => {
+            println!("cycle-tracker-report-start: deserialize-block-header");
+            let block: BeaconBlock = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-block-header");
             let _ = pre_state.process_block_header(&block);
         }
-        OperationInput::SignedBLSToExecutionChange(bls_change) => {
+        OperationName::BLSToExecutionChange => {
+            println!("cycle-tracker-report-start: deserialize-bls-to-execution-change");
+            let bls_change: SignedBLSToExecutionChange = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-bls-to-execution-change");
             let _ = pre_state.process_bls_to_execution_change(&bls_change);
         }
-        OperationInput::Deposit(deposit) => {
+        OperationName::Deposit => {
+            println!("cycle-tracker-report-start: deserialize-deposit");
+            let deposit: Deposit = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-deposit");
             let _ = pre_state.process_deposit(&deposit);
         }
-        OperationInput::BeaconBlockBody(_block_body) => {
+        OperationName::ExecutionPayload => {
             panic!("Not implemented");
+            // let block_body: BeaconBlockBody = deserialize(&input.data);
             // let _ = pre_state.process_execution_payload(&block_body);
         }
-        OperationInput::ProposerSlashing(proposer_slashing) => {
+        OperationName::ProposerSlashing => {
+            println!("cycle-tracker-report-start: deserialize-proposer-slashing");
+            let proposer_slashing: ProposerSlashing = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-proposer-slashing");
             let _ = pre_state.process_proposer_slashing(&proposer_slashing);
         }
-        OperationInput::SyncAggregate(sync_aggregate) => {
+        OperationName::SyncAggregate => {
+            println!("cycle-tracker-report-start: deserialize-sync-aggregate");
+            let sync_aggregate: SyncAggregate = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-sync-aggregate");
             let _ = pre_state.process_sync_aggregate(&sync_aggregate);
         }
-        OperationInput::SignedVoluntaryExit(voluntary_exit) => {
+        OperationName::VoluntaryExit => {
+            println!("cycle-tracker-report-start: deserialize-voluntary-exit");
+            let voluntary_exit: SignedVoluntaryExit = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-voluntary-exit");
             let _ = pre_state.process_voluntary_exit(&voluntary_exit);
         }
-        OperationInput::ExecutionPayload(execution_payload) => {
+        OperationName::Withdrawals => {
+            println!("cycle-tracker-report-start: deserialize-withdrawals");
+            let execution_payload: ExecutionPayload = deserialize(&input.data);
+            println!("cycle-tracker-report-end: deserialize-withdrawals");
             let _ = pre_state.process_withdrawals(&execution_payload);
         }
     }
@@ -69,7 +117,6 @@ pub fn main() {
 
     println!("cycle-tracker-report-start: convert-to-ssz-bytes");
     let pre_state_bytes = pre_state.as_ssz_bytes();
-
     println!("cycle-tracker-report-end: convert-to-ssz-bytes");
 
     println!("cycle-tracker-report-start: commit");

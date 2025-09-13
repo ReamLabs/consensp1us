@@ -57,9 +57,9 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "alloy-consensus"
-version = "0.15.9"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e95f195ff89abc65469bb141b8ac73d69ea0c3589331f1ad10573f5e05beb168"
+checksum = "ad451f9a70c341d951bca4e811d74dbe1e193897acd17e9dbac1353698cc430b"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -96,9 +96,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-eip7702"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "804cefe429015b4244966c006d25bda5545fa9db5990e9c9079faf255052f50a"
+checksum = "9d4769c6ffddca380b0070d71c8b7f30bed375543fe76bb2f74ec0acf4b7cd16"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -107,9 +107,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-eips"
-version = "0.15.9"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c763c3a7c99d3eb61c8383a0c54264372f2ef13353cbb8fa0769c601c102a0a"
+checksum = "3056872f6da48046913e76edb5ddced272861f6032f09461aea1a2497be5ae5d"
 dependencies = [
  "alloy-eip2124",
  "alloy-eip2930",
@@ -996,7 +996,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -1016,7 +1016,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -1862,6 +1862,15 @@ checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "ethereum_hashing"
+version = "0.7.0"
+source = "git+https://github.com/ReamLabs/ethereum_hashing.git?rev=c14a9ad96436e6b8b631faf49a3666e4558b71ae#c14a9ad96436e6b8b631faf49a3666e4558b71ae"
+dependencies = [
+ "ring",
+ "sha2",
 ]
 
 [[package]]
@@ -2894,7 +2903,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.52.6",
+ "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -3814,7 +3823,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "157c5a9d7ea5c2ed2d9fb8f495b64759f7816c7eaea54ba3978f0d63000162e3"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -4013,13 +4022,14 @@ dependencies = [
 [[package]]
 name = "ream-bls"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/ReamLabs/ream#05bbd33e6207ce2e1a03b56758680814ea084d4a"
 dependencies = [
  "alloy-primitives",
  "anyhow",
  "bls12_381 0.8.0",
  "ethereum_ssz",
  "ethereum_ssz_derive",
+ "group 0.13.0",
  "serde",
  "sha2",
  "ssz_types",
@@ -4029,25 +4039,51 @@ dependencies = [
 ]
 
 [[package]]
-name = "ream-consensus"
+name = "ream-consensus-beacon"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/ReamLabs/ream#05bbd33e6207ce2e1a03b56758680814ea084d4a"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
  "alloy-rlp",
  "anyhow",
  "async-trait",
- "ethereum_hashing",
+ "ethereum_hashing 0.7.0 (git+https://github.com/ReamLabs/ethereum_hashing.git?rev=c14a9ad96436e6b8b631faf49a3666e4558b71ae)",
  "ethereum_serde_utils",
  "ethereum_ssz",
  "ethereum_ssz_derive",
  "itertools 0.14.0",
  "ream-bls",
+ "ream-consensus-misc",
  "ream-merkle",
+ "ream-network-spec",
  "serde",
  "serde_json",
  "serde_yaml",
+ "sha2",
+ "snap",
+ "ssz_types",
+ "thiserror 2.0.11",
+ "tracing",
+ "tree_hash",
+ "tree_hash_derive",
+]
+
+[[package]]
+name = "ream-consensus-misc"
+version = "0.1.0"
+source = "git+https://github.com/ReamLabs/ream#05bbd33e6207ce2e1a03b56758680814ea084d4a"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "anyhow",
+ "ethereum_hashing 0.7.0 (git+https://github.com/ReamLabs/ethereum_hashing.git?rev=c14a9ad96436e6b8b631faf49a3666e4558b71ae)",
+ "ethereum_serde_utils",
+ "ethereum_ssz",
+ "ethereum_ssz_derive",
+ "ream-bls",
+ "serde",
+ "serde_json",
  "sha2",
  "ssz_types",
  "thiserror 2.0.11",
@@ -4059,8 +4095,10 @@ dependencies = [
 name = "ream-lib"
 version = "0.1.0"
 dependencies = [
+ "clap",
+ "derive_more 2.0.1",
  "ethereum_ssz",
- "ream-consensus",
+ "ream-consensus-beacon",
  "serde",
  "snap",
  "tracing",
@@ -4069,11 +4107,25 @@ dependencies = [
 [[package]]
 name = "ream-merkle"
 version = "0.1.0"
-source = "git+https://github.com/ReamLabs/ream#39bcd36f87954351ce5396fa996a910a397a3ab8"
+source = "git+https://github.com/ReamLabs/ream#05bbd33e6207ce2e1a03b56758680814ea084d4a"
 dependencies = [
  "alloy-primitives",
  "anyhow",
- "ethereum_hashing",
+ "ethereum_hashing 0.7.0 (git+https://github.com/ReamLabs/ethereum_hashing.git?rev=c14a9ad96436e6b8b631faf49a3666e4558b71ae)",
+ "serde",
+]
+
+[[package]]
+name = "ream-network-spec"
+version = "0.1.0"
+source = "git+https://github.com/ReamLabs/ream#05bbd33e6207ce2e1a03b56758680814ea084d4a"
+dependencies = [
+ "alloy-primitives",
+ "anyhow",
+ "ethereum_serde_utils",
+ "ream-consensus-misc",
+ "serde",
+ "serde_yaml",
 ]
 
 [[package]]
@@ -4081,7 +4133,7 @@ name = "ream-operations"
 version = "0.1.0"
 dependencies = [
  "ethereum_ssz",
- "ream-consensus",
+ "ream-consensus-beacon",
  "ream-lib",
  "sp1-derive",
  "sp1-zkvm",
@@ -4096,7 +4148,7 @@ dependencies = [
  "dotenv",
  "ethereum_ssz",
  "hex",
- "ream-consensus",
+ "ream-consensus-beacon",
  "ream-lib",
  "serde",
  "serde_json",
@@ -5336,8 +5388,7 @@ dependencies = [
 [[package]]
 name = "ssz_types"
 version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75b55bedc9a18ed2860a46d6beb4f4082416ee1d60be0cc364cebdcdddc7afd4"
+source = "git+https://github.com/ReamLabs/ssz_types?branch=removable-variable-list#01de4ea4385064ca3985bfc3ab24e825f107c64c"
 dependencies = [
  "ethereum_serde_utils",
  "ethereum_ssz",
@@ -5842,7 +5893,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee44f4cef85f88b4dea21c0b1f58320bdf35715cf56d840969487cff00613321"
 dependencies = [
  "alloy-primitives",
- "ethereum_hashing",
+ "ethereum_hashing 0.7.0 (git+https://github.com/ReamLabs/ethereum_hashing)",
  "ethereum_ssz",
  "smallvec",
  "typenum",

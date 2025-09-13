@@ -17,7 +17,7 @@ generate an EVM-compatible proof.
 To build the program, run the following command:
 
 ```sh
-cd program
+cd program/operations
 cargo prove build
 ```
 
@@ -28,7 +28,7 @@ To run the program without generating a proof:
 ```sh
 cd script
 make download
-cargo run --release -- --execute --operation_name <OPERATION_NAME>
+cargo run --release -- --execute --operation-name <OPERATION_NAME> --ef-test
 ```
 
 ```
@@ -57,5 +57,5 @@ To generate a core proof for your program:
 
 ```sh
 cd script
-cargo run --release -- --prove --operation_name <OPERATION_NAME>
+cargo run --release -- --prove --operation-name <OPERATION_NAME> --ef-test
 ```

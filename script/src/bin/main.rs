@@ -2,11 +2,9 @@ use clap::Parser;
 use sp1_sdk::{ProverClient, SP1Stdin, include_elf};
 use tracing::{error, info};
 
-use ream_consensus::electra::beacon_state::BeaconState;
-use ream_lib::{file::read_file, input::OperationInput};
+use ream_lib::{file::read_file_raw, input::OperationInput};
 
 mod cli;
-use cli::operation::OperationName;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const OPERATIONS_ELF: &[u8] = include_elf!("ream-operations");
@@ -99,9 +97,9 @@ fn main() {
         // Load the test assets.
         // These assets are from consensus-specs repo.
         let base_dir = test_case_dir
-            .join(format!("{}", fork))
+            .join(format!("{fork}"))
             .join("operations")
-            .join(format!("{}", operation_name))
+            .join(format!("{operation_name}"))
             .join("pyspec_tests");
 
         let test_cases = ream_lib::file::get_test_cases(&base_dir);
@@ -112,44 +110,24 @@ fn main() {
             }
 
             info!("{}", "-".repeat(50));
-            info!("[{}] Test case: {}", operation_name, test_case);
+            info!("[{}] Test case: {}", operation_name.clone(), test_case);
 
             let case_dir = &base_dir.join(&test_case);
             let input_path =
                 &case_dir.join(format!("{}.ssz_snappy", operation_name.to_input_name()));
 
-            println!("case path: {:?}", case_dir);
+            println!("case path: {case_dir:?}");
 
-            let pre_state: BeaconState = read_file(&case_dir.join("pre.ssz_snappy"));
-            let input = match operation_name {
-                OperationName::Attestation => OperationInput::Attestation(read_file(input_path)),
-                OperationName::AttesterSlashing => {
-                    OperationInput::AttesterSlashing(read_file(input_path))
-                }
-                OperationName::BlockHeader => OperationInput::BeaconBlock(read_file(input_path)),
-                OperationName::BLSToExecutionChange => {
-                    OperationInput::SignedBLSToExecutionChange(read_file(input_path))
-                }
-                OperationName::Deposit => OperationInput::Deposit(read_file(input_path)),
-                OperationName::ExecutionPayload => {
-                    OperationInput::BeaconBlockBody(read_file(input_path))
-                }
-                OperationName::ProposerSlashing => {
-                    OperationInput::ProposerSlashing(read_file(input_path))
-                }
-                OperationName::SyncAggregate => {
-                    OperationInput::SyncAggregate(read_file(input_path))
-                }
-                OperationName::VoluntaryExit => {
-                    OperationInput::SignedVoluntaryExit(read_file(input_path))
-                }
-                OperationName::Withdrawals => {
-                    OperationInput::ExecutionPayload(read_file(input_path))
-                }
+            let pre_state_bytes = read_file_raw(&case_dir.join("pre.ssz_snappy"));
+            let input_data = read_file_raw(input_path);
+
+            let input = OperationInput {
+                op: operation_name.clone(),
+                data: input_data,
             };
-            let post_state_opt: Option<BeaconState> = {
+            let post_state_opt = {
                 if case_dir.join("post.ssz_snappy").exists() {
-                    Some(read_file(&case_dir.join("post.ssz_snappy")))
+                    Some(read_file_raw(&case_dir.join("post.ssz_snappy")))
                 } else {
                     None
                 }
@@ -161,7 +139,7 @@ fn main() {
             // Setup the inputs.
             let mut stdin = SP1Stdin::new();
 
-            stdin.write(&pre_state);
+            stdin.write(&pre_state_bytes);
             stdin.write(&input);
 
             if args.execute {
@@ -170,7 +148,8 @@ fn main() {
                 info!("Program executed successfully.");
 
                 // Decode the output
-                let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
+                // let result: BeaconState = ssz::Decode::from_ssz_bytes(output.as_slice()).unwrap();
+                let result = output.as_slice();
 
                 // Match `post_state_opt`: some test cases should not mutate beacon state.
                 match post_state_opt {
@@ -179,7 +158,7 @@ fn main() {
                         info!("Execution is correct!: State mutated");
                     }
                     None => {
-                        assert_eq!(result, pre_state);
+                        assert_eq!(result, pre_state_bytes);
                         info!("Execution is correct!: State should not be mutated");
                     }
                 }

@@ -9,14 +9,14 @@ name = "ream"
 path = "src/bin/main.rs"
 
 [dependencies]
-sp1-sdk = { version = "5.2.1", features = ["native-gnark"], default-features = false }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-serde = { version = "1.0.200", default-features = false, features = ["derive"] }
-derive_more = { version = "2.0.1", features = ["full"] }
-clap = { version = "4.0", features = ["derive", "env"] }
-tracing = { workspace = true }
-hex = "0.4.3"
+clap = { workspace = true }
+derive_more = { workspace = true }
 dotenv = "0.15.0"
+hex = "0.4.3"
+serde = { workspace = true }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+sp1-sdk = { version = "5.2.1", features = ["native-gnark"], default-features = false }
+tracing = { workspace = true }
 
 # Ethereum dependencies
 ethereum_ssz = { workspace = true }
